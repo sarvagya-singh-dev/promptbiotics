@@ -193,7 +193,7 @@ const Footer = () => (
           <h4 className="font-bold text-[var(--color-text)] mb-4 text-sm uppercase tracking-widest">Company</h4>
           <ul className="space-y-3 text-[var(--color-telemetrySlate)] text-[var(--text-xs)]">
             <li><a href="#" className="hover:text-[var(--color-text)] transition-colors">About</a></li>
-            <li><a href="#" className="hover:text-[var(--color-text)] transition-colors">Research paper</a></li>
+            <li><a href="https://drive.google.com/file/d/1rg1I4-He-EgzCPeyVw7RZdr-Nkgiaesw/view?usp=sharing" className="hover:text-[var(--color-text)] transition-colors">Research paper</a></li>
             <li><a href="#" className="hover:text-[var(--color-text)] transition-colors">Contact</a></li>
             <li><a href="#" className="hover:text-[var(--color-text)] transition-colors">Privacy</a></li>
           </ul>
@@ -251,9 +251,9 @@ const Hero = () => {
           >
             Start Demo
           </button>
-          <button className="border border-[var(--color-border)] text-[var(--color-text)] px-8 py-4 font-mono text-xs uppercase rounded-[var(--radius-control)] hover:bg-[var(--color-surface)] transition-colors">
+          <a href="https://drive.google.com/file/d/1rg1I4-He-EgzCPeyVw7RZdr-Nkgiaesw/view?usp=sharing" className="border border-[var(--color-border)] text-[var(--color-text)] px-8 py-4 font-mono text-xs uppercase rounded-[var(--radius-control)] hover:bg-[var(--color-surface)] transition-colors" target="_blank" rel="noopener noreferrer">
             Read the Paper
-          </button>
+          </a>
         </div>
 
         <div className="mt-12 flex items-center gap-6 text-[var(--text-xs)] font-mono text-[var(--color-telemetrySlate)]">
