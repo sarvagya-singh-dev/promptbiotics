@@ -1,25 +1,29 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const ibmPlexMono = IBM_Plex_Mono({
+  variable: "--font-ibm-plex-mono",
   subsets: ["latin"],
+  weight: "400",
+  display: "swap",
 });
 
 export const metadata = {
-  title: "PromptBiotics | Clinical Reasoning System", // Updated title to match your UI
+  title: "PromptBiotics | Clinical Reasoning System",
   description: "A nutritional diet planning LLM and clinical reasoning system.",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#050505] text-white`}>
+    <html lang="en" data-theme="light">
+      <body className={`${inter.variable} ${ibmPlexMono.variable} antialiased`}>
         {children}
       </body>
     </html>

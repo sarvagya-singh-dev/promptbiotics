@@ -1,26 +1,153 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ============================================
+   LIGHT THEME (default — data-theme="light")
+   Clinical light mode: clean, readable, not AI-slop
+   ============================================ */
+[data-theme="light"] {
+  /* Base (structural) */
+  --color-bg: #FFFFFF;
+  --color-surface: #F8FAFC;
+  --color-border: #E2E8F0;
+  --color-border-focus: #0891B2;
+
+  /* Text */
+  --color-text: #0F172A;
+  --color-text-muted: #475569;
+  --color-text-inverse: #FFFFFF;
+
+  /* Accent (actions only — clinical teal, not purple/neon) */
+  --color-accent: #0891B2;
+  --color-accent-hover: #0E7490;
+  --color-accent-muted: #0891B2;
+
+  /* Status (semantic — never decorative) */
+  --color-warning: #EA580C;
+  --color-danger: #DC2626;
+  --color-success: #15803D;
+  --color-info: #64748B;
+
+  /* Deprecated aliases (mapped to light theme) */
+  --color-foreground: #0F172A;
+  --color-periwinkle: #0891B2;
+  --color-slate: #475569;
+  --color-ridge: #E2E8F0;
+  --color-anomaly: #EA580C;
+  --color-glass: #F8FAFC;
+  --color-glass-trench: #F8FAFC;
+  --color-glassTrench: #F8FAFC;
+  --color-subtle-ridge: #E2E8F0;
+  --color-subtleRidge: #E2E8F0;
+  --color-periwinkleGlow: #0891B2;
+  --color-opticWhite: #0F172A;
+  --color-telemetrySlate: #475569;
+  --color-telemetry-slate: #475569;
+  --color-acid: #0891B2;
+  --color-cyan: #0891B2;
+  --color-obsidianDeep: #FFFFFF;
+  --color-spectralViolet: #0891B2;
+  --color-spectral-violet: #0891B2;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ============================================
+   DARK THEME (data-theme="dark")
+   ============================================ */
+[data-theme="dark"] {
+  /* Base (structural) — not pure black */
+  --color-bg: #0F172A;
+  --color-surface: #1E293B;
+  --color-border: #334155;
+  --color-border-focus: #22D3EE;
+
+  /* Text */
+  --color-text: #F8FAFC;
+  --color-text-muted: #94A3B8;
+  --color-text-inverse: #0F172A;
+
+  /* Accent (actions only — clinical teal) */
+  --color-accent: #22D3EE;
+  --color-accent-hover: #67E8F9;
+  --color-accent-muted: #22D3EE;
+
+  /* Status (semantic — lightened for dark mode readability) */
+  --color-warning: #FB923C;
+  --color-danger: #F87171;
+  --color-success: #4ADE80;
+  --color-info: #94A3B8;
+
+  /* Deprecated aliases (mapped to dark theme) */
+  --color-foreground: #F8FAFC;
+  --color-periwinkle: #22D3EE;
+  --color-slate: #94A3B8;
+  --color-ridge: #334155;
+  --color-anomaly: #FB923C;
+  --color-glass: #1E293B;
+  --color-glass-trench: #1E293B;
+  --color-glassTrench: #1E293B;
+  --color-subtle-ridge: #334155;
+  --color-subtleRidge: #334155;
+  --color-periwinkleGlow: #22D3EE;
+  --color-opticWhite: #F8FAFC;
+  --color-telemetrySlate: #94A3B8;
+  --color-telemetry-slate: #94A3B8;
+  --color-acid: #22D3EE;
+  --color-cyan: #22D3EE;
+  --color-obsidianDeep: #0F172A;
+  --color-spectralViolet: #22D3EE;
+  --color-spectral-violet: #22D3EE;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ============================================
+   Shared design tokens
+   ============================================ */
+@theme {
+  /* Spacing scale — only these values, nothing between */
+  --spacing-1: 0.25rem;   /* 4px */
+  --spacing-2: 0.5rem;    /* 8px */
+  --spacing-4: 1rem;      /* 16px */
+  --spacing-6: 1.5rem;    /* 24px */
+  --spacing-8: 2rem;      /* 32px */
+  --spacing-12: 3rem;     /* 48px */
+  --spacing-16: 4rem;     /* 64px */
+  --spacing-24: 6rem;     /* 96px */
+
+  /* Radii — only 3, chosen by element role */
+  --radius-control: 0.375rem;   /* buttons, inputs, pills */
+  --radius-card: 0.5rem;        /* cards */
+  --radius-image: 0;            /* square-cornered images */
+
+  /* Shadows — one rule only */
+  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+
+  /* Type scale — body at 16px minimum */
+  --text-body: 1rem;        /* 16px */
+  --text-sm: 0.875rem;      /* 14px */
+  --text-xs: 0.75rem;       /* 12px — labels only */
+  --text-lg: 1.125rem;      /* 18px */
+  --text-xl: 1.25rem;       /* 20px */
+  --text-2xl: 1.5rem;       /* 24px */
+  --text-4xl: 2.25rem;      /* 36px */
+  --text-6xl: 3.75rem;      /* 60px */
+  --text-9xl: 5.625rem;     /* 90px */
+
+  /* Fonts — Inter for body/headings, IBM Plex Mono for code/labels */
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-ibm-plex-mono);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: 1.6;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+a {
+  color: var(--color-accent);
+}
+
+*:focus-visible {
+  outline: 2px solid var(--color-accent);
 }

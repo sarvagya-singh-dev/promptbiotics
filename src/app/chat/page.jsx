@@ -28,69 +28,6 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/app/lib/firebase-config';
 import { clearUserCookies, getUserFromCookies } from '@/app/lib/auth-cookies';
 
-// --- THEME CONSTANTS ---
-const THEME = {
-  acid: '#D9FF00', // Primary
-  cyan: '#00F0FF', // Secondary
-  void: '#050505',
-  dark: '#0A0A0A',
-  glass: 'rgba(20, 20, 20, 0.8)',
-  border: 'rgba(255, 255, 255, 0.1)'
-};
-
-// --- VISUAL UTILS ---
-const NoiseOverlay = () => (
-  <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.03] mix-blend-overlay"
-       style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E")` }} 
-  />
-);
-
-const MedicalParticles = () => {
-  const [particles, setParticles] = useState([]);
-  useEffect(() => {
-    const newParticles = [];
-    for (let i = 0; i < 30; i++) {
-      newParticles.push({
-        id: i,
-        initialX: Math.random() * 100,
-        initialY: Math.random() * 100,
-        duration: Math.random() * 20 + 10,
-        delay: Math.random() * 5,
-        size: Math.random() * 3 + 1,
-        opacity: Math.random() * 0.4 + 0.1,
-      });
-    }
-    setParticles(newParticles);
-  }, []);
-  return (
-    <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-      {particles.map((p) => (
-        <motion.div
-          key={p.id}
-          className="absolute rounded-full"
-          style={{
-            width: p.size,
-            height: p.size,
-            background: `linear-gradient(45deg, ${THEME.acid}, ${THEME.cyan})`,
-            left: `${p.initialX}%`,
-            top: `${p.initialY}%`,
-            opacity: p.opacity
-          }}
-          animate={{
-            y: [0, -100],
-            opacity: [0, p.opacity, 0]
-          }}
-          transition={{
-            duration: p.duration,
-            repeat: Infinity,
-            ease: "linear",
-            delay: p.delay
-          }}
-        />
-      ))}
-    </div>
-  );
-};
 
 // ============================================================================
 // RESTORED UI COMPONENTS (STYLED)
@@ -117,7 +54,7 @@ function FileUpload({ onFileUpload, acceptedTypes = "image/*,.pdf,.doc,.docx,.tx
   return (
     <motion.div
       className={`relative border border-dashed rounded-lg p-6 text-center transition-all cursor-pointer group mb-4 ${
-        isDragging ? 'border-[#D9FF00] bg-[#D9FF00]/5' : 'border-[#333] bg-[#0A0A0A] hover:border-[#666]'
+        isDragging ? 'border-[var(--color-accent)] bg-[var(--color-accent)]/5' : 'border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[#666]'
       }`}
       onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
       onDragLeave={(e) => { e.preventDefault(); setIsDragging(false); }}
@@ -129,11 +66,11 @@ function FileUpload({ onFileUpload, acceptedTypes = "image/*,.pdf,.doc,.docx,.tx
       onClick={() => fileInputRef.current?.click()}
     >
       <input ref={fileInputRef} type="file" multiple accept={acceptedTypes} onChange={(e) => handleFiles(Array.from(e.target.files))} className="hidden" />
-      <div className="w-12 h-12 rounded-full bg-[#111] border border-[#333] flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-         <Upload className={`w-5 h-5 ${isDragging ? 'text-[#D9FF00]' : 'text-gray-400'}`} />
+      <div className="w-12 h-12 rounded-full bg-[var(--color-surface)] border border-[var(--color-border)] flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+         <Upload className={`w-5 h-5 ${isDragging ? 'text-[var(--color-accent)]' : 'text-[var(--color-text-muted)]'}`} />
       </div>
-      <p className="text-gray-300 font-mono text-xs tracking-wider">DROP FILES / CLICK TO SCAN</p>
-      <p className="text-gray-600 text-[10px] mt-1 font-mono">MAX {maxSize}MB • SECURE UPLOAD</p>
+      <p className="text-[var(--color-text-muted)] font-mono text-xs tracking-wider">DROP FILES / CLICK TO SCAN</p>
+      <p className="text-[var(--color-text-muted)] text-[10px] mt-1 font-mono">MAX {maxSize}MB • SECURE UPLOAD</p>
     </motion.div>
   );
 }
@@ -202,7 +139,7 @@ function ConfidenceDisplay({ confidence }) {
           </span>
         </div>
         <div className="text-right">
-          <span className="text-2xl font-bold text-white font-mono">
+          <span className="text-2xl font-bold text-[var(--color-text)] font-mono">
             {(confidence.overall_confidence * 100).toFixed(1)}%
           </span>
         </div>
@@ -212,7 +149,7 @@ function ConfidenceDisplay({ confidence }) {
       <div className="space-y-3 relative z-10">
         {confidence.component_scores && Object.entries(confidence.component_scores).map(([key, value], index) => (
           <div key={key} className="space-y-1">
-            <div className="flex justify-between text-[10px] font-mono uppercase tracking-wider text-gray-400">
+            <div className="flex justify-between text-[10px] font-mono uppercase tracking-wider text-[var(--color-text-muted)]">
               <span>{key.replace(/_/g, ' ')}</span>
               <span className={colors.text}>{(value * 100).toFixed(0)}%</span>
             </div>
@@ -253,17 +190,17 @@ function SafetyBadge({ safety }) {
 function MedicalContext({ medicalContext, domain }) {
   if (!medicalContext) return null;
   return (
-    <div className="mt-4 p-4 rounded-xl bg-[#111] border border-[#333] relative">
-      <div className="absolute top-0 left-0 w-1 h-full bg-[#00F0FF]" />
-      <h3 className="text-xs font-bold text-[#00F0FF] mb-3 uppercase flex items-center gap-2">
+    <div className="mt-4 p-4 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] relative">
+      <div className="absolute top-0 left-0 w-1 h-full bg-[var(--color-accent)]" />
+      <h3 className="text-xs font-bold text-[var(--color-accent)] mb-3 uppercase flex items-center gap-2">
         <Brain className="w-3 h-3" /> {domain} CONTEXT
       </h3>
       
       {medicalContext.safety_considerations?.length > 0 && (
         <div className="mb-3">
-          <h4 className="text-[10px] text-gray-500 uppercase mb-2">Safety Protocols</h4>
+          <h4 className="text-[10px] text-[var(--color-text-muted)] uppercase mb-2">Safety Protocols</h4>
           {medicalContext.safety_considerations.map((item, i) => (
-            <div key={i} className="flex gap-2 text-xs text-gray-300 mb-1">
+            <div key={i} className="flex gap-2 text-xs text-[var(--color-text-muted)] mb-1">
               <Shield className="w-3 h-3 text-red-400 shrink-0" /> {item}
             </div>
           ))}
@@ -272,10 +209,10 @@ function MedicalContext({ medicalContext, domain }) {
 
       {medicalContext.follow_up_recommendations?.length > 0 && (
         <div>
-          <h4 className="text-[10px] text-gray-500 uppercase mb-2">Recommended Actions</h4>
+          <h4 className="text-[10px] text-[var(--color-text-muted)] uppercase mb-2">Recommended Actions</h4>
           {medicalContext.follow_up_recommendations.map((item, i) => (
-            <div key={i} className="flex gap-2 text-xs text-gray-300 mb-1">
-              <TrendingUp className="w-3 h-3 text-[#D9FF00] shrink-0" /> {item}
+            <div key={i} className="flex gap-2 text-xs text-[var(--color-text-muted)] mb-1">
+              <TrendingUp className="w-3 h-3 text-[var(--color-accent)] shrink-0" /> {item}
             </div>
           ))}
         </div>
@@ -287,16 +224,16 @@ function MedicalContext({ medicalContext, domain }) {
 // 5. Typing Indicator
 function ClinicalTypingIndicator() {
   return (
-    <div className="flex items-center gap-3 p-4 rounded-xl bg-[#111] border border-[#333] w-fit mb-6">
-      <Loader2 className="w-4 h-4 text-[#D9FF00] animate-spin" />
-      <span className="text-xs font-mono text-[#D9FF00] animate-pulse">ANALYZING BIOMETRICS...</span>
+    <div className="flex items-center gap-3 p-4 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] w-fit mb-6">
+      <Loader2 className="w-4 h-4 text-[var(--color-accent)] animate-spin" />
+      <span className="text-xs font-mono text-[var(--color-accent)] animate-pulse">ANALYZING BIOMETRICS...</span>
       <div className="flex gap-1">
         {[0, 1, 2].map(i => (
           <motion.div
             key={i}
             animate={{ scale: [1, 1.5, 1], opacity: [0.3, 1, 0.3] }}
             transition={{ repeat: Infinity, duration: 1, delay: i * 0.2 }}
-            className="w-1 h-1 bg-[#00F0FF] rounded-full"
+            className="w-1 h-1 bg-[var(--color-accent)] rounded-full"
           />
         ))}
       </div>
@@ -319,13 +256,13 @@ function QuickActions({ onActionSelect }) {
         <button
           key={action.id}
           onClick={() => onActionSelect(action.id)}
-          className="group p-4 bg-[#111] border border-[#333] hover:border-[#D9FF00] hover:bg-[#D9FF00]/5 rounded-xl text-left transition-all"
+          className="group p-4 bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[var(--color-accent)] hover:bg-[var(--color-accent)]/5 rounded-xl text-left transition-all"
         >
-          <div className="w-8 h-8 rounded bg-[#222] group-hover:bg-[#D9FF00] group-hover:text-black flex items-center justify-center mb-2 transition-colors">
-            <action.icon className="w-4 h-4 text-gray-400 group-hover:text-black" />
+          <div className="w-8 h-8 rounded bg-[var(--color-surface)] group-hover:bg-[var(--color-accent)] group-hover:text-black flex items-center justify-center mb-2 transition-colors">
+            <action.icon className="w-4 h-4 text-[var(--color-text-muted)] group-hover:text-black" />
           </div>
-          <div className="text-xs font-bold text-white font-mono">{action.label}</div>
-          <div className="text-[10px] text-gray-500">{action.desc}</div>
+          <div className="text-xs font-bold text-[var(--color-text)] font-mono">{action.label}</div>
+          <div className="text-[10px] text-[var(--color-text-muted)]">{action.desc}</div>
         </button>
       ))}
     </div>
@@ -350,23 +287,23 @@ function ClinicalMessage({ text, message, isUser, apiResponse, messageType }) {
         <div className={`
           p-6 rounded-2xl border backdrop-blur-md relative overflow-hidden shadow-2xl
           ${isUser 
-            ? 'bg-[#111] border-[#333] text-gray-200' 
-            : 'bg-[#0A0A0A]/90 border-[#333] text-gray-300'}
+            ? 'bg-[var(--color-surface)] border-[var(--color-border)] text-[var(--color-text-muted)]' 
+            : 'bg-[var(--color-surface)]/90 border-[var(--color-border)] text-[var(--color-text-muted)]'}
         `}>
           
           {/* AI Header Info */}
           {isAI && (
             <>
-              <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#D9FF00] to-[#00F0FF] opacity-80" />
-              <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#222]">
+              <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[var(--color-accent)] to-[var(--color-accent)] opacity-80" />
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-[var(--color-border)]">
                 <div className="flex items-center gap-2">
-                  <Brain className="w-4 h-4 text-[#D9FF00]" />
-                  <span className="text-xs font-mono text-[#D9FF00] tracking-widest uppercase">
+                  <Brain className="w-4 h-4 text-[var(--color-accent)]" />
+                  <span className="text-xs font-mono text-[var(--color-accent)] tracking-widest uppercase">
                     {apiResponse?.domain || 'CLINICAL_CORE'}
                   </span>
                 </div>
                 {apiResponse?.processing_time && (
-                   <span className="flex items-center gap-1 text-[10px] font-mono text-gray-500">
+                   <span className="flex items-center gap-1 text-[10px] font-mono text-[var(--color-text-muted)]">
                      <Zap className="w-3 h-3" /> {Number(apiResponse.processing_time).toFixed(2)}s
                    </span>
                 )}
@@ -381,8 +318,8 @@ function ClinicalMessage({ text, message, isUser, apiResponse, messageType }) {
           {/* Main Text Content */}
           <div 
             className="prose prose-invert prose-sm max-w-none font-sans 
-            prose-headings:font-mono prose-headings:text-white prose-headings:uppercase
-            prose-strong:text-[#D9FF00] prose-code:text-[#00F0FF] prose-a:text-[#00F0FF] prose-a:underline"
+            prose-headings:font-mono prose-headings:text-[var(--color-text)] prose-headings:uppercase
+            prose-strong:text-[var(--color-accent)] prose-code:text-[var(--color-accent)] prose-a:text-[var(--color-accent)] prose-a:underline"
             dangerouslySetInnerHTML={{ 
               __html: marked.parse(String(rawContent)) 
             }}
@@ -395,28 +332,28 @@ function ClinicalMessage({ text, message, isUser, apiResponse, messageType }) {
 
           {/* RESTORED SOURCES SECTION */}
           {isAI && apiResponse?.sources?.length > 0 && (
-            <div className="mt-6 pt-4 border-t border-[#222]">
-              <h4 className="text-[10px] font-mono text-gray-500 mb-3 uppercase flex items-center gap-2">
+            <div className="mt-6 pt-4 border-t border-[var(--color-border)]">
+              <h4 className="text-[10px] font-mono text-[var(--color-text-muted)] mb-3 uppercase flex items-center gap-2">
                 <FileText className="w-3 h-3" /> VERIFIED MEDICAL SOURCES ({apiResponse.sources.length})
               </h4>
               
               <div className="grid gap-2">
                 {apiResponse.sources.slice(0, 5).map((source, i) => (
-                  <div key={i} className="bg-[#111] p-3 rounded border border-[#222] hover:border-[#333] transition-colors flex gap-3 group">
-                    <span className="text-[#D9FF00] font-mono text-xs mt-0.5">[{i+1}]</span>
+                  <div key={i} className="bg-[var(--color-surface)] p-3 rounded border border-[var(--color-border)] hover:border-[var(--color-border)] transition-colors flex gap-3 group">
+                    <span className="text-[var(--color-accent)] font-mono text-xs mt-0.5">[{i+1}]</span>
                     <div className="min-w-0 flex-1">
                       <div className="flex justify-between items-start">
-                        <p className="text-xs text-gray-300 font-bold uppercase tracking-wider mb-0.5">
+                        <p className="text-xs text-[var(--color-text-muted)] font-bold uppercase tracking-wider mb-0.5">
                           {source.source_type || 'General Reference'}
                         </p>
                         {source.relevance_score && (
-                           <span className="text-[10px] text-gray-600 bg-black/30 px-1.5 py-0.5 rounded border border-[#333]">
+                           <span className="text-[10px] text-[var(--color-text-muted)] bg-black/30 px-1.5 py-0.5 rounded border border-[var(--color-border)]">
                              {(source.relevance_score * 100).toFixed(0)}% RELEVANT
                            </span>
                         )}
                       </div>
                       
-                      <p className="text-[11px] text-gray-500 leading-relaxed line-clamp-2 mb-1.5">
+                      <p className="text-[11px] text-[var(--color-text-muted)] leading-relaxed line-clamp-2 mb-1.5">
                         {source.content}
                       </p>
 
@@ -426,12 +363,12 @@ function ClinicalMessage({ text, message, isUser, apiResponse, messageType }) {
                           href={source.source_url} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="text-[10px] text-[#00F0FF] hover:text-white hover:underline flex items-center gap-1 w-fit transition-colors"
+                          className="text-[10px] text-[var(--color-accent)] hover:text-[var(--color-text)] hover:underline flex items-center gap-1 w-fit transition-colors"
                         >
                           OPEN SOURCE <ExternalLink className="w-2.5 h-2.5" />
                         </a>
                       ) : (
-                        <span className="text-[10px] text-gray-600 italic flex items-center gap-1">
+                        <span className="text-[10px] text-[var(--color-text-muted)] italic flex items-center gap-1">
                           Offline Reference <Shield className="w-2.5 h-2.5" />
                         </span>
                       )}
@@ -445,8 +382,8 @@ function ClinicalMessage({ text, message, isUser, apiResponse, messageType }) {
       </div>
 
       {/* Avatar */}
-      <div className={`w-10 h-10 rounded-full flex items-center justify-center border border-[#333] bg-[#0A0A0A] shadow-lg shrink-0 ${isUser ? 'order-1 mr-4' : 'order-2 ml-4'}`}>
-        {isUser ? <User className="w-5 h-5 text-gray-400" /> : <Activity className="w-5 h-5 text-[#D9FF00]" />}
+      <div className={`w-10 h-10 rounded-full flex items-center justify-center border border-[var(--color-border)] bg-[var(--color-surface)] shadow-lg shrink-0 ${isUser ? 'order-1 mr-4' : 'order-2 ml-4'}`}>
+        {isUser ? <User className="w-5 h-5 text-[var(--color-text-muted)]" /> : <Activity className="w-5 h-5 text-[var(--color-accent)]" />}
       </div>
     </motion.div>
   );
@@ -472,7 +409,7 @@ export default function ClinicalConsole() {
   const messagesEndRef = useRef(null);
 
   // API Config
-  const API_URL = 'https://healthcare-ai-729813973979.us-central1.run.app/api/query';
+  const API_URL = 'https://healthcare-ai-service-729813973979.us-central1.run.app/api/query';
   const API_KEY = 'aslka@kasdmSw12'; 
 
   // 1. Auth & Data Loading
@@ -657,47 +594,44 @@ const getBMICategory = (bmi) => {
 
 
   if (!currentUser) return (
-    <div className="min-h-screen bg-[#050505] flex items-center justify-center text-[#D9FF00] font-mono">
+    <div className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center text-[var(--color-accent)] font-mono">
       <Loader2 className="animate-spin mr-2" /> ACCESSING SECURE RECORDS...
     </div>
   );
 
   return (
-    <div className="flex h-screen bg-[#050505] text-white font-sans selection:bg-[#D9FF00] selection:text-black overflow-hidden relative">
-      <NoiseOverlay />
-      <MedicalParticles />
-
+    <div className="flex h-screen bg-[var(--color-bg)] text-[var(--color-text)] font-sans selection:bg-[var(--color-accent)] selection:text-black overflow-hidden relative">
       {/* SIDEBAR */}
-      <div className="hidden md:flex w-72 border-r border-[#222] bg-[#0A0A0A]/90 backdrop-blur flex-col z-20">
-        <div className="p-6 border-b border-[#222]">
+      <div className="hidden md:flex w-72 border-r border-[var(--color-border)] bg-[var(--color-surface)]/90 backdrop-blur flex-col z-20">
+        <div className="p-6 border-b border-[var(--color-border)]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-[#D9FF00]/10 border border-[#D9FF00]/20 flex items-center justify-center animate-pulse">
-              <Activity className="w-5 h-5 text-[#D9FF00]" />
+            <div className="w-10 h-10 rounded-lg bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 flex items-center justify-center animate-pulse">
+              <Activity className="w-5 h-5 text-[var(--color-accent)]" />
             </div>
             <div>
               <h1 className="font-bold text-sm tracking-wider">PROMPT_BIOTICS</h1>
-              <p className="text-[10px] text-gray-500 font-mono">CLINICAL OS V3.0</p>
+              <p className="text-[10px] text-[var(--color-text-muted)] font-mono">CLINICAL OS V3.0</p>
             </div>
           </div>
         </div>
 
         <div className="flex-1 p-5 overflow-y-auto">
           <div className="mb-6">
-            <p className="text-[10px] font-mono text-gray-500 mb-3 uppercase tracking-widest">Active Patient</p>
-            <div className="bg-[#111] border border-[#222] rounded-xl p-4 space-y-3 relative overflow-hidden">
+            <p className="text-[10px] font-mono text-[var(--color-text-muted)] mb-3 uppercase tracking-widest">Active Patient</p>
+            <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 space-y-3 relative overflow-hidden">
                <div className="absolute top-0 right-0 p-2 opacity-20"><User className="w-12 h-12" /></div>
                <div>
-                  <div className="text-xs text-gray-500">Name</div>
+                  <div className="text-xs text-[var(--color-text-muted)]">Name</div>
                   <div className="font-mono text-sm">{currentUser.name}</div>
                </div>
                <div className="grid grid-cols-2 gap-2">
                  <div>
-                    <div className="text-xs text-gray-500">Age</div>
+                    <div className="text-xs text-[var(--color-text-muted)]">Age</div>
                     <div className="font-mono">{userData?.age || 'N/A'}</div>
                  </div>
                  <div>
-                    <div className="text-xs text-gray-500">BMI</div>
-                    <div className="font-mono text-[#D9FF00]">
+                    <div className="text-xs text-[var(--color-text-muted)]">BMI</div>
+                    <div className="font-mono text-[var(--color-accent)]">
                       {userData?.weight && userData?.height 
                         ? (userData.weight / ((userData.height/100)**2)).toFixed(1) 
                         : '--'}
@@ -708,8 +642,8 @@ const getBMICategory = (bmi) => {
           </div>
         </div>
 
-        <div className="p-4 border-t border-[#222]">
-           <button onClick={() => { clearUserCookies(); router.push('/'); }} className="w-full flex items-center justify-center gap-2 p-3 rounded hover:bg-red-900/20 text-gray-500 hover:text-red-400 transition-colors text-xs font-mono border border-transparent hover:border-red-900/30">
+        <div className="p-4 border-t border-[var(--color-border)]">
+           <button onClick={() => { clearUserCookies(); router.push('/'); }} className="w-full flex items-center justify-center gap-2 p-3 rounded hover:bg-[var(--color-danger)]/20 text-[var(--color-text-muted)] hover:text-[var(--color-danger)] transition-colors text-xs font-mono border border-transparent hover:border-[var(--color-danger)]/30">
              <LogOut className="w-3 h-3" /> SECURE LOGOUT
            </button>
         </div>
@@ -718,12 +652,12 @@ const getBMICategory = (bmi) => {
       {/* MAIN CHAT AREA */}
       <div className="flex-1 flex flex-col relative z-10 bg-gradient-to-b from-[#0A0A0A] to-[#050505]">
         {/* Header */}
-        <header className="h-16 border-b border-[#222] bg-[#0A0A0A]/50 backdrop-blur flex items-center justify-between px-6 shrink-0">
+        <header className="h-16 border-b border-[var(--color-border)] bg-[var(--color-surface)]/50 backdrop-blur flex items-center justify-between px-6 shrink-0">
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-[#D9FF00] animate-pulse" />
-            <span className="text-xs font-mono text-gray-400 tracking-widest">LIVE_SESSION</span>
+            <div className="w-2 h-2 rounded-full bg-[var(--color-accent)] animate-pulse" />
+            <span className="text-xs font-mono text-[var(--color-text-muted)] tracking-widest">LIVE_SESSION</span>
           </div>
-          <span className="text-xs font-mono text-[#00F0FF]">{new Date().toLocaleTimeString()}</span>
+          <span className="text-xs font-mono text-[var(--color-accent)]">{new Date().toLocaleTimeString()}</span>
         </header>
 
         {/* Messages */}
@@ -745,7 +679,7 @@ const getBMICategory = (bmi) => {
         </div>
 
         {/* Input Area */}
-        <div className="p-4 md:p-6 bg-[#0A0A0A] border-t border-[#222] shrink-0">
+        <div className="p-4 md:p-6 bg-[var(--color-surface)] border-t border-[var(--color-border)] shrink-0">
           <div className="max-w-4xl mx-auto space-y-4">
             
             <AnimatePresence>
@@ -765,10 +699,10 @@ const getBMICategory = (bmi) => {
             {uploadedFiles.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {uploadedFiles.map(f => (
-                  <div key={f.id} className="bg-[#111] border border-[#333] px-3 py-1.5 rounded text-xs flex items-center gap-2 text-[#D9FF00]">
+                  <div key={f.id} className="bg-[var(--color-surface)] border border-[var(--color-border)] px-3 py-1.5 rounded text-xs flex items-center gap-2 text-[var(--color-accent)]">
                     <Paperclip className="w-3 h-3" /> {f.name}
                     <button onClick={() => setUploadedFiles(prev => prev.filter(p => p.id !== f.id))}>
-                      <X className="w-3 h-3 hover:text-white" />
+                      <X className="w-3 h-3 hover:text-[var(--color-text)]" />
                     </button>
                   </div>
                 ))}
@@ -776,11 +710,11 @@ const getBMICategory = (bmi) => {
             )}
 
             <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-[#D9FF00] to-[#00F0FF] opacity-0 group-focus-within:opacity-10 blur-xl transition-opacity rounded-xl pointer-events-none" />
-              <div className="bg-[#111] border border-[#333] rounded-xl flex items-end p-2 relative z-10 transition-colors group-focus-within:border-[#444] shadow-lg">
+              /* gradient removed */
+              <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-card)] flex items-end p-2 relative z-10 transition-colors group-focus-within:border-[#444] shadow-[var(--shadow-card)]">
                 <button 
                   onClick={() => setShowFileUpload(!showFileUpload)}
-                  className={`p-3 rounded-lg hover:bg-[#222] transition-colors ${showFileUpload ? 'text-[#D9FF00]' : 'text-gray-400'}`}
+                  className={`p-3 rounded-[var(--radius-control)] hover:bg-[var(--color-surface)] transition-colors ${showFileUpload ? 'text-[var(--color-accent)]' : 'text-[#8E9BAE]'}`}
                 >
                   <Paperclip className="w-5 h-5" />
                 </button>
@@ -790,17 +724,17 @@ const getBMICategory = (bmi) => {
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={e => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }}}
                   placeholder="Enter clinical query or attach reports..."
-                  className="flex-1 bg-transparent border-none text-white p-3 max-h-32 min-h-[48px] resize-none focus:ring-0 placeholder:text-gray-600 font-mono text-sm"
+                  className="flex-1 bg-transparent border-none text-[var(--color-text)] p-3 max-h-32 min-h-[48px] resize-none focus:ring-0 placeholder:text-[#8E9BAE] font-mono text-sm"
                   rows={1}
                 />
 
                 <button 
                   onClick={() => handleSend()}
                   disabled={isTyping || (!input && uploadedFiles.length === 0)}
-                  className={`p-3 rounded-lg transition-all ${
+                  className={`p-3 rounded-[var(--radius-control)] transition-all ${
                     input || uploadedFiles.length > 0 
-                      ? 'bg-[#D9FF00] text-black hover:bg-white shadow-[0_0_15px_rgba(217,255,0,0.3)]' 
-                      : 'bg-[#222] text-gray-600 cursor-not-allowed'
+                      ? 'bg-[var(--color-accent)] text-black hover:opacity-90' 
+                      : 'bg-[var(--color-surface)] text-[#8E9BAE] cursor-not-allowed'
                   }`}
                 >
                   {isTyping ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
@@ -808,9 +742,9 @@ const getBMICategory = (bmi) => {
               </div>
             </div>
             
-            <div className="flex justify-between items-center text-[10px] text-gray-600 font-mono uppercase">
-               <span>AI-Assisted Clinical Decision Support</span>
-               <span>v2.4.0 • Secure Encryption</span>
+            <div className="flex justify-between items-center text-[var(--text-xs)] text-[#8E9BAE] font-mono uppercase">
+               <span>PromptBiotics • Drug-nutrient interaction checking</span>
+               <span>v2.4.0</span>
             </div>
           </div>
         </div>
